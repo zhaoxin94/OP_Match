@@ -36,7 +36,7 @@ def main():
         f"device: {args.device}, "
         f"n_gpu: {args.n_gpu}, "
         f"distributed training: {bool(args.local_rank != -1)}, "
-        f"16-bits training: {args.amp}",)
+        f"16-bits training: {args.amp}", )
     logger.info(dict(args._get_kwargs()))
     if args.seed is not None:
         set_seed(args)
@@ -75,14 +75,16 @@ def main():
 
     if args.amp:
         from apex import amp
-        model, optimizer = amp.initialize(
-            model, optimizer, opt_level=args.opt_level)
+        model, optimizer = amp.initialize(model,
+                                          optimizer,
+                                          opt_level=args.opt_level)
 
     if args.local_rank != -1:
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[args.local_rank],
-            output_device=args.local_rank, find_unused_parameters=True)
-
+            model,
+            device_ids=[args.local_rank],
+            output_device=args.local_rank,
+            find_unused_parameters=True)
 
     model.zero_grad()
     if not args.eval_only:
@@ -90,15 +92,16 @@ def main():
         logger.info(f"  Task = {args.dataset}@{args.num_labeled}")
         logger.info(f"  Num Epochs = {args.epochs}")
         logger.info(f"  Batch size per GPU = {args.batch_size}")
-        logger.info(f"  Total train batch size = {args.batch_size*args.world_size}")
+        logger.info(
+            f"  Total train batch size = {args.batch_size*args.world_size}")
         logger.info(f"  Total optimization steps = {args.total_steps}")
-        train(args, labeled_trainloader, unlabeled_dataset, test_loader, val_loader,
-              ood_loaders, model, optimizer, ema_model, scheduler)
+        train(args, labeled_trainloader, unlabeled_dataset, test_loader,
+              val_loader, ood_loaders, model, optimizer, ema_model, scheduler)
     else:
         logger.info("***** Running Evaluation *****")
         logger.info(f"  Task = {args.dataset}@{args.num_labeled}")
-        eval_model(args, labeled_trainloader, unlabeled_dataset, test_loader, val_loader,
-             ood_loaders, model, ema_model)
+        eval_model(args, labeled_trainloader, unlabeled_dataset, test_loader,
+                   val_loader, ood_loaders, model, ema_model)
 
 
 if __name__ == '__main__':
