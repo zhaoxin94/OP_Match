@@ -77,10 +77,11 @@ def main():
         scheduler.load_state_dict(checkpoint['scheduler'])
 
     if args.amp:
-        from apex import amp
-        model, optimizer = amp.initialize(model,
-                                          optimizer,
-                                          opt_level=args.opt_level)
+        # from apex import amp
+        # model, optimizer = amp.initialize(model,
+        #                                   optimizer,
+        #                                   opt_level=args.opt_level)
+        pass
 
     if args.local_rank != -1:
         model = torch.nn.parallel.DistributedDataParallel(

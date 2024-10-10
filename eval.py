@@ -7,7 +7,8 @@ best_acc_val = 0
 def eval_model(args, labeled_trainloader, unlabeled_dataset, test_loader, val_loader,
           ood_loaders, model, ema_model):
     if args.amp:
-        from apex import amp
+        pass
+
     global best_acc
     global best_acc_val
 

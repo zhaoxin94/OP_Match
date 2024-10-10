@@ -22,7 +22,7 @@ best_acc_val = 0
 def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
           val_loader, ood_loaders, model, optimizer, ema_model, scheduler):
     if args.amp:
-        from apex import amp
+        pass
 
     global best_acc
     global best_acc_val
@@ -184,8 +184,7 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
             loss = Lx + Lo + args.lambda_oem * L_oem  \
                    + args.lambda_socr * L_socr + L_fix
             if args.amp:
-                with amp.scale_loss(loss, optimizer) as scaled_loss:
-                    scaled_loss.backward()
+                pass
             else:
                 loss.backward()
 
