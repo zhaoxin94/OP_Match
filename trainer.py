@@ -67,6 +67,10 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
         mean = normal_mean
         std = normal_std
         func_trans = TransformFixMatch_Imagenet_Weak
+    elif args.dataset == 'opendas':
+        mean = normal_mean
+        std = normal_std
+        func_trans = TransformFixMatch_Imagenet_Weak
 
     unlabeled_dataset_all.transform = func_trans(mean=mean, std=std)
     labeled_dataset = copy.deepcopy(labeled_trainloader.dataset)

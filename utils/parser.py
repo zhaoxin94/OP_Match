@@ -56,7 +56,7 @@ def set_parser():
     parser.add_argument('--dataset',
                         default='cifar10',
                         type=str,
-                        choices=['cifar10', 'cifar100', 'imagenet'],
+                        choices=['cifar10', 'cifar100', 'imagenet', 'opendas'],
                         help='dataset name')
     ## Hyper-parameters
     parser.add_argument('--opt',
