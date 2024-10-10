@@ -43,14 +43,17 @@ def main():
     if args.local_rank in [-1, 0]:
         os.makedirs(args.out, exist_ok=True)
         args.writer = SummaryWriter(args.out)
+    # TODO：set model architecture, number of classes, image size, etc.
     set_model_config(args)
 
     if args.local_rank not in [-1, 0]:
         torch.distributed.barrier()
 
+    # TODO: set dataset
     labeled_trainloader, unlabeled_dataset, test_loader, val_loader, ood_loaders \
         = set_dataset(args)
 
+    # TODO: set model
     model, optimizer, scheduler = set_models(args)
     logger.info("Total params: {:.2f}M".format(
         sum(p.numel() for p in model.parameters()) / 1e6))

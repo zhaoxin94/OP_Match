@@ -65,6 +65,9 @@ def set_model_config(args):
 
     elif args.dataset == "imagenet":
         args.num_classes = 20
+    
+    elif args.dataset == "opendas":
+        args.num_classes = 3
 
     args.image_size = (32, 32, 3)
     if args.dataset == 'cifar10':
@@ -77,17 +80,21 @@ def set_model_config(args):
         args.ood_data = ['lsun', 'dtd', 'cub', 'flowers102',
                          'caltech_256', 'stanford_dogs']
         args.image_size = (224, 224, 3)
+    
+    elif args.dataset == 'opendas':
+        args.image_size = (224, 224, 3)
 
 def set_dataset(args):
     labeled_dataset, unlabeled_dataset, test_dataset, val_dataset = \
         DATASET_GETTERS[args.dataset](args)
 
+    # zhaoxin: no ood datasets
     ood_loaders = {}
-    for ood in args.ood_data:
-        ood_dataset = get_ood(ood, args.dataset, image_size=args.image_size)
-        ood_loaders[ood] = DataLoader(ood_dataset,
-                                      batch_size=args.batch_size,
-                                      num_workers=args.num_workers)
+    # for ood in args.ood_data:
+    #     ood_dataset = get_ood(ood, args.dataset, image_size=args.image_size)
+    #     ood_loaders[ood] = DataLoader(ood_dataset,
+    #                                   batch_size=args.batch_size,
+    #                                   num_workers=args.num_workers)
 
     if args.local_rank == 0:
         torch.distributed.barrier()

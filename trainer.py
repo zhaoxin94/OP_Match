@@ -54,6 +54,7 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
 
     model.train()
     unlabeled_dataset_all = copy.deepcopy(unlabeled_dataset)
+    # TODO: set tranformation
     if args.dataset == 'cifar10':
         mean = cifar10_mean
         std = cifar10_std
@@ -108,26 +109,26 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
             ## Data loading
 
             try:
-                (_, inputs_x_s, inputs_x), targets_x = labeled_iter.next()
+                (_, inputs_x_s, inputs_x), targets_x = next(labeled_iter)
             except:
                 if args.world_size > 1:
                     labeled_epoch += 1
                     labeled_trainloader.sampler.set_epoch(labeled_epoch)
                 labeled_iter = iter(labeled_trainloader)
-                (_, inputs_x_s, inputs_x), targets_x = labeled_iter.next()
+                (_, inputs_x_s, inputs_x), targets_x = next(labeled_iter)
             try:
-                (inputs_u_w, inputs_u_s, _), _ = unlabeled_iter.next()
+                (inputs_u_w, inputs_u_s, _), _ = next(unlabeled_iter)
             except:
                 if args.world_size > 1:
                     unlabeled_epoch += 1
                     unlabeled_trainloader.sampler.set_epoch(unlabeled_epoch)
                 unlabeled_iter = iter(unlabeled_trainloader)
-                (inputs_u_w, inputs_u_s, _), _ = unlabeled_iter.next()
+                (inputs_u_w, inputs_u_s, _), _ = next(unlabeled_iter)
             try:
-                (inputs_all_w, inputs_all_s, _), _ = unlabeled_all_iter.next()
+                (inputs_all_w, inputs_all_s, _), _ = next(unlabeled_all_iter)
             except:
                 unlabeled_all_iter = iter(unlabeled_trainloader_all)
-                (inputs_all_w, inputs_all_s, _), _ = unlabeled_all_iter.next()
+                (inputs_all_w, inputs_all_s, _), _ = next(unlabeled_all_iter)
             data_time.update(time.time() - end)
 
             b_size = inputs_x.shape[0]
@@ -229,9 +230,10 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
             test_unk, test_roc, test_roc_softm, test_id \
                 = test(args, test_loader, test_model, epoch)
 
-            for ood in ood_loaders.keys():
-                roc_ood = test_ood(args, test_id, ood_loaders[ood], test_model)
-                logger.info("ROC vs {ood}: {roc}".format(ood=ood, roc=roc_ood))
+            # zhaoxin: no ood evaluation
+            # for ood in ood_loaders.keys():
+            #     roc_ood = test_ood(args, test_id, ood_loaders[ood], test_model)
+            #     logger.info("ROC vs {ood}: {roc}".format(ood=ood, roc=roc_ood))
 
             args.writer.add_scalar('train/1.train_loss', losses.avg, epoch)
             args.writer.add_scalar('train/2.train_loss_x', losses_x.avg, epoch)

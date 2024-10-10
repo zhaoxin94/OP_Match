@@ -174,6 +174,33 @@ def get_imagenet(args, norm=True):
                 f"Valdation samples: {len(dataset_val)}")
     return dataset_labeled, dataset_unlabeled, dataset_test, dataset_val
 
+def get_opendas(args, norm=True):
+    mean = normal_mean
+    std = normal_std
+    txt_labeled = "filelist/opendas_train_labeled.txt"
+    txt_unlabeled = "filelist/opendas_train_unlabeled.txt"
+    txt_val = "filelist/opendas_val.txt"
+    txt_test = "filelist/opendas_test.txt"
+    ## This function will be overwritten in trainer.py
+    norm_func = TransformFixMatch_Imagenet(mean=mean,
+                                           std=std,
+                                           norm=norm,
+                                           size_image=224)
+    dataset_labeled = ImageFolder(txt_labeled, transform=norm_func)
+    dataset_unlabeled = ImageFolder_fix(txt_unlabeled, transform=norm_func)
+
+    test_transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=mean, std=std)
+    ])
+    dataset_val = ImageFolder(txt_val, transform=test_transform)
+    dataset_test = ImageFolder(txt_test, transform=test_transform)
+    logger.info(f"Labeled examples: {len(dataset_labeled)}"
+                f"Unlabeled examples: {len(dataset_unlabeled)}"
+                f"Valdation samples: {len(dataset_val)}")
+    return dataset_labeled, dataset_unlabeled, dataset_test, dataset_val
 
 def x_u_split(args, labels):
     label_per_class = args.num_labeled  #// args.num_classes
@@ -611,4 +638,5 @@ DATASET_GETTERS = {
     'cifar10': get_cifar,
     'cifar100': get_cifar,
     'imagenet': get_imagenet,
+    'opendas': get_opendas
 }

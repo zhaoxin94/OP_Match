@@ -1,1 +1,4 @@
 filelist
+data
+save_directory
+*.pyc
