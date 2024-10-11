@@ -12,11 +12,12 @@ from torch.optim.lr_scheduler import LambdaLR
 
 from dataset.cifar import DATASET_GETTERS, get_ood
 
-__all__ = ['create_model', 'set_model_config',
-           'set_dataset', 'set_models',
-           'save_checkpoint', 'set_seed']
+__all__ = [
+    'create_model', 'set_model_config', 'set_dataset', 'set_models',
+    'save_checkpoint', 'set_seed'
+]
 
-
+# TODO: model
 def create_model(args):
     if 'wideresnet' in args.arch:
         import models.wideresnet as models
@@ -37,8 +38,7 @@ def create_model(args):
 
     return model
 
-
-
+# TODO：set model architecture, number of classes, image size, etc.
 def set_model_config(args):
 
     if args.dataset == 'cifar10':
@@ -65,7 +65,7 @@ def set_model_config(args):
 
     elif args.dataset == "imagenet":
         args.num_classes = 20
-    
+
     elif args.dataset == "opendas":
         args.num_classes = 3
 
@@ -77,12 +77,14 @@ def set_model_config(args):
         args.ood_data = ['cifar10', "svhn", 'lsun', 'imagenet']
 
     elif 'imagenet' in args.dataset:
-        args.ood_data = ['lsun', 'dtd', 'cub', 'flowers102',
-                         'caltech_256', 'stanford_dogs']
+        args.ood_data = [
+            'lsun', 'dtd', 'cub', 'flowers102', 'caltech_256', 'stanford_dogs'
+        ]
         args.image_size = (224, 224, 3)
-    
+
     elif args.dataset == 'opendas':
         args.image_size = (224, 224, 3)
+
 
 def set_dataset(args):
     labeled_dataset, unlabeled_dataset, test_dataset, val_dataset = \
@@ -101,23 +103,20 @@ def set_dataset(args):
 
     train_sampler = RandomSampler if args.local_rank == -1 else DistributedSampler
 
-    labeled_trainloader = DataLoader(
-        labeled_dataset,
-        sampler=train_sampler(labeled_dataset),
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        drop_last=True)
+    labeled_trainloader = DataLoader(labeled_dataset,
+                                     sampler=train_sampler(labeled_dataset),
+                                     batch_size=args.batch_size,
+                                     num_workers=args.num_workers,
+                                     drop_last=True)
 
-    test_loader = DataLoader(
-        test_dataset,
-        sampler=SequentialSampler(test_dataset),
-        batch_size=args.batch_size,
-        num_workers=args.num_workers)
-    val_loader = DataLoader(
-        val_dataset,
-        sampler=SequentialSampler(val_dataset),
-        batch_size=args.batch_size,
-        num_workers=args.num_workers)
+    test_loader = DataLoader(test_dataset,
+                             sampler=SequentialSampler(test_dataset),
+                             batch_size=args.batch_size,
+                             num_workers=args.num_workers)
+    val_loader = DataLoader(val_dataset,
+                            sampler=SequentialSampler(val_dataset),
+                            batch_size=args.batch_size,
+                            num_workers=args.num_workers)
     if args.local_rank not in [-1, 0]:
         torch.distributed.barrier()
 
@@ -128,7 +127,7 @@ def set_dataset(args):
 def get_cosine_schedule_with_warmup(optimizer,
                                     num_warmup_steps,
                                     num_training_steps,
-                                    num_cycles=7./16.,
+                                    num_cycles=7. / 16.,
                                     last_epoch=-1):
     def _lr_lambda(current_step):
         if current_step < num_warmup_steps:
@@ -147,21 +146,32 @@ def set_models(args):
     model.to(args.device)
 
     no_decay = ['bias', 'bn']
-    grouped_parameters = [
-        {'params': [p for n, p in model.named_parameters() if not any(
-            nd in n for nd in no_decay)], 'weight_decay': args.wdecay},
-        {'params': [p for n, p in model.named_parameters() if any(
-            nd in n for nd in no_decay)], 'weight_decay': 0.0}
-    ]
+    grouped_parameters = [{
+        'params': [
+            p for n, p in model.named_parameters()
+            if not any(nd in n for nd in no_decay)
+        ],
+        'weight_decay':
+        args.wdecay
+    }, {
+        'params': [
+            p for n, p in model.named_parameters()
+            if any(nd in n for nd in no_decay)
+        ],
+        'weight_decay':
+        0.0
+    }]
     if args.opt == 'sgd':
-        optimizer = optim.SGD(grouped_parameters, lr=args.lr,
-                              momentum=0.9, nesterov=args.nesterov)
+        optimizer = optim.SGD(grouped_parameters,
+                              lr=args.lr,
+                              momentum=0.9,
+                              nesterov=args.nesterov)
     elif args.opt == 'adam':
         optimizer = optim.Adam(grouped_parameters, lr=2e-3)
 
     # args.epochs = math.ceil(args.total_steps / args.eval_step)
-    scheduler = get_cosine_schedule_with_warmup(
-        optimizer, args.warmup, args.total_steps)
+    scheduler = get_cosine_schedule_with_warmup(optimizer, args.warmup,
+                                                args.total_steps)
 
     return model, optimizer, scheduler
 

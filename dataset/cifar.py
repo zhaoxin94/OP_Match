@@ -14,17 +14,21 @@ logger = logging.getLogger(__name__)
 __all__ = [
     'TransformOpenMatch', 'TransformFixMatch', 'cifar10_mean', 'cifar10_std',
     'cifar100_mean', 'cifar100_std', 'normal_mean', 'normal_std',
-    'TransformFixMatch_Imagenet', 'TransformFixMatch_Imagenet_Weak'
+    'imagenet_mean', 'imagenet_std', 'TransformFixMatch_Imagenet',
+    'TransformFixMatch_Imagenet_Weak'
 ]
 ### Enter Path of the data directory.
 DATA_PATH = './data'
 
+# TODO: need to add imagenet mean and std! Very Important!
 cifar10_mean = (0.4914, 0.4822, 0.4465)
 cifar10_std = (0.2471, 0.2435, 0.2616)
 cifar100_mean = (0.5071, 0.4867, 0.4408)
 cifar100_std = (0.2675, 0.2565, 0.2761)
 normal_mean = (0.5, 0.5, 0.5)
 normal_std = (0.5, 0.5, 0.5)
+imagenet_mean = (0.485, 0.456, 0.406)
+imagenet_std = (0.229, 0.224, 0.225)
 
 
 def get_cifar(args, norm=True):
@@ -174,6 +178,8 @@ def get_imagenet(args, norm=True):
                 f"Valdation samples: {len(dataset_val)}")
     return dataset_labeled, dataset_unlabeled, dataset_test, dataset_val
 
+
+# TODO: set dataset
 def get_opendas(args, norm=True):
     mean = normal_mean
     std = normal_std
@@ -201,6 +207,7 @@ def get_opendas(args, norm=True):
                 f"Unlabeled examples: {len(dataset_unlabeled)}"
                 f"Valdation samples: {len(dataset_val)}")
     return dataset_labeled, dataset_unlabeled, dataset_test, dataset_val
+
 
 def x_u_split(args, labels):
     label_per_class = args.num_labeled  #// args.num_classes
@@ -634,6 +641,7 @@ def get_ood(dataset, id, test_only=False, image_size=None):
     return test_set
 
 
+# TODO: set dataset
 DATASET_GETTERS = {
     'cifar10': get_cifar,
     'cifar100': get_cifar,

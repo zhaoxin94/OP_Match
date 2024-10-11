@@ -66,8 +66,7 @@ with open('filelist/opendas_train.txt', "r") as f0:
                         assert label < n_source, "something wrong!"
                         f2.write(line)
                     elif i in unlabeled_idx:
-                        label = label if label < n_source else n_source
-                        f3.write('{:} {:}\n'.format(path, label))
+                        f3.write(line)
                     else:
                         raise NotImplementedError
 

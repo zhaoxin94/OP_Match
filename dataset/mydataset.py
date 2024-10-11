@@ -5,13 +5,23 @@ import os.path
 import numpy as np
 
 IMG_EXTENSIONS = [
-    '.jpg', '.JPG', '.jpeg', '.JPEG',
-    '.png', '.PNG', '.ppm', '.PPM', '.bmp', '.BMP',
+    '.jpg',
+    '.JPG',
+    '.jpeg',
+    '.JPEG',
+    '.png',
+    '.PNG',
+    '.ppm',
+    '.PPM',
+    '.bmp',
+    '.BMP',
 ]
 
 
 def find_classes(dir):
-    classes = [d for d in os.listdir(dir) if os.path.isdir(os.path.join(dir, d))]
+    classes = [
+        d for d in os.listdir(dir) if os.path.isdir(os.path.join(dir, d))
+    ]
     classes.sort()
     class_to_idx = {classes[i]: i for i in range(len(classes))}
     return classes, class_to_idx
@@ -92,12 +102,17 @@ class ImageFolder(data.Dataset):
         class_to_idx (dict): Dict with items (class_name, class_index).
         imgs (list): List of (image path, class_index) tuples
     """
-
-    def __init__(self, image_list, transform=None, target_transform=None, return_paths=False,
-                 loader=default_loader,train=False, return_id=False):
+    def __init__(self,
+                 image_list,
+                 transform=None,
+                 target_transform=None,
+                 return_paths=False,
+                 loader=default_loader,
+                 train=False,
+                 return_id=False):
         imgs, labels = make_dataset_nolist(image_list)
         self.imgs = imgs
-        self.labels= labels
+        self.labels = labels
         self.transform = transform
         self.target_transform = target_transform
         self.loader = loader
@@ -123,7 +138,7 @@ class ImageFolder(data.Dataset):
         if self.return_paths:
             return img, target, path
         elif self.return_id:
-            return img, target ,index
+            return img, target, index
         else:
             return img, target
 
@@ -151,12 +166,17 @@ class ImageFolder_fix(data.Dataset):
         class_to_idx (dict): Dict with items (class_name, class_index).
         imgs (list): List of (image path, class_index) tuples
     """
-
-    def __init__(self, image_list, transform=None, target_transform=None, return_paths=False,
-                 loader=default_loader,train=False, return_id=False):
+    def __init__(self,
+                 image_list,
+                 transform=None,
+                 target_transform=None,
+                 return_paths=False,
+                 loader=default_loader,
+                 train=False,
+                 return_id=False):
         imgs, labels = make_dataset_nolist(image_list)
         self.imgs = imgs
-        self.labels= labels
+        self.labels = labels
         self.transform = transform
         self.target_transform = target_transform
         self.loader = loader
@@ -177,8 +197,6 @@ class ImageFolder_fix(data.Dataset):
         self.imgs_index = self.imgs
         self.targets_index = self.labels
 
-
-
     def __getitem__(self, index):
         """
         Args:
@@ -197,10 +215,9 @@ class ImageFolder_fix(data.Dataset):
         if self.return_paths:
             return img, target, path
         elif self.return_id:
-            return img, target ,index
+            return img, target, index
         else:
             return img, target
 
     def __len__(self):
         return len(self.imgs_index)
-

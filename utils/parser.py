@@ -18,7 +18,7 @@ def set_parser():
     parser.add_argument(
         "--amp",
         action="store_true",
-        help="use 16-bit (mixed) precision through NVIDIA apex AMP")
+        help="use 16-bit (mixed) precision through AMP")
     parser.add_argument(
         "--opt_level",
         type=str,

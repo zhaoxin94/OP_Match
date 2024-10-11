@@ -54,6 +54,7 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
 
     model.train()
     unlabeled_dataset_all = copy.deepcopy(unlabeled_dataset)
+    
     # TODO: set tranformation
     if args.dataset == 'cifar10':
         mean = cifar10_mean
@@ -111,7 +112,6 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
 
         for batch_idx in range(args.eval_step):
             ## Data loading
-
             try:
                 (_, inputs_x_s, inputs_x), targets_x = next(labeled_iter)
             except:
