@@ -1,4 +1,5 @@
 filelist
 data
 save_directory
+result
 *.pyc

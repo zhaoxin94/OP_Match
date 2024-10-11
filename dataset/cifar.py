@@ -166,7 +166,7 @@ def get_imagenet(args, norm=True):
     dataset_unlabeled = ImageFolder_fix(txt_unlabeled, transform=norm_func)
 
     test_transform = transforms.Compose([
-        transforms.Resize(256),
+        transforms.Resize((256, 256)),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=mean, std=std)
@@ -196,7 +196,7 @@ def get_opendas(args, norm=True):
     dataset_unlabeled = ImageFolder_fix(txt_unlabeled, transform=norm_func)
 
     test_transform = transforms.Compose([
-        transforms.Resize(256),
+        transforms.Resize((256, 256)),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=mean, std=std)
@@ -303,19 +303,19 @@ class TransformOpenMatch(object):
 class TransformFixMatch_Imagenet(object):
     def __init__(self, mean, std, norm=True, size_image=224):
         self.weak = transforms.Compose([
-            transforms.Scale((256, 256)),
+            transforms.Resize((256, 256)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(size=size_image,
                                   padding=int(size_image * 0.125),
                                   padding_mode='reflect')
         ])
         self.weak2 = transforms.Compose([
-            transforms.Scale((256, 256)),
+            transforms.Resize((256, 256)),
             transforms.RandomHorizontalFlip(),
             transforms.CenterCrop(size=size_image),
         ])
         self.strong = transforms.Compose([
-            transforms.Scale((256, 256)),
+            transforms.Resize((256, 256)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(size=size_image,
                                   padding=int(size_image * 0.125),
@@ -341,19 +341,19 @@ class TransformFixMatch_Imagenet(object):
 class TransformFixMatch_Imagenet_Weak(object):
     def __init__(self, mean, std, norm=True, size_image=224):
         self.weak = transforms.Compose([
-            transforms.Scale((256, 256)),
+            transforms.Resize((256, 256)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(size=size_image,
                                   padding=int(size_image * 0.125),
                                   padding_mode='reflect')
         ])
         self.weak2 = transforms.Compose([
-            transforms.Scale((256, 256)),
+            transforms.Resize((256, 256)),
             transforms.RandomHorizontalFlip(),
             transforms.CenterCrop(size=size_image),
         ])
         self.strong = transforms.Compose([
-            transforms.Scale((256, 256)),
+            transforms.Resize((256, 256)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomCrop(size=size_image,
                                   padding=int(size_image * 0.125),
