@@ -14,7 +14,7 @@ from utils import AverageMeter, ova_loss,\
     save_checkpoint, ova_ent, \
     test, test_ood, exclude_dataset
 
-logger = logging.getLogger(__name__)
+
 best_acc = 0
 best_acc_val = 0
 
@@ -54,7 +54,7 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
 
     model.train()
     unlabeled_dataset_all = copy.deepcopy(unlabeled_dataset)
-    
+
     # TODO: set tranformation
     if args.dataset == 'cifar10':
         mean = cifar10_mean
@@ -86,9 +86,6 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
 
     for epoch in range(args.start_epoch, args.epochs):
         output_args["epoch"] = epoch
-        if not args.no_progress:
-            p_bar = tqdm(range(args.eval_step),
-                         disable=args.local_rank not in [-1, 0])
 
         if epoch >= args.start_fix:
             ## pick pseudo-inliers
@@ -110,7 +107,18 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
         unlabeled_iter = iter(unlabeled_trainloader)
         unlabeled_all_iter = iter(unlabeled_trainloader_all)
 
-        for batch_idx in range(args.eval_step):
+        len_labeled_dataset = len(labeled_trainloader)
+        len_unlabeled_dataset = len(unlabeled_trainloader_all)
+        num_batches = max(len_labeled_dataset, len_unlabeled_dataset)
+        
+        if not args.no_progress:
+            p_bar = tqdm(range(num_batches),
+                         disable=args.local_rank not in [-1, 0])
+        print(
+            'number of batches:{}, length of labeled dataset:{}, length of unlabeled dataset:{}'
+            .format(num_batches, len_labeled_dataset, len_unlabeled_dataset))
+
+        for batch_idx in range(num_batches):
             ## Data loading
             try:
                 (_, inputs_x_s, inputs_x), targets_x = next(labeled_iter)
@@ -236,7 +244,7 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
             # zhaoxin: no ood evaluation
             # for ood in ood_loaders.keys():
             #     roc_ood = test_ood(args, test_id, ood_loaders[ood], test_model)
-            #     logger.info("ROC vs {ood}: {roc}".format(ood=ood, roc=roc_ood))
+            #     print("ROC vs {ood}: {roc}".format(ood=ood, roc=roc_ood))
 
             args.writer.add_scalar('train/1.train_loss', losses.avg, epoch)
             args.writer.add_scalar('train/2.train_loss_x', losses_x.avg, epoch)
@@ -286,13 +294,13 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
                     scheduler.state_dict(),
                 }, is_best, args.out)
             test_accs.append(test_acc_close)
-            logger.info('Best val closed acc: {:.3f}'.format(best_acc_val))
-            logger.info('Valid closed acc: {:.3f}'.format(close_valid))
-            logger.info('Valid overall acc: {:.3f}'.format(overall_valid))
-            logger.info('Valid unk acc: {:.3f}'.format(unk_valid))
-            logger.info('Valid roc: {:.3f}'.format(roc_valid))
-            logger.info('Valid roc soft: {:.3f}'.format(roc_softm_valid))
-            logger.info('Mean top-1 acc: {:.3f}\n'.format(
+            print('Best val closed acc: {:.3f}'.format(best_acc_val))
+            print('Valid closed acc: {:.3f}'.format(close_valid))
+            print('Valid overall acc: {:.3f}'.format(overall_valid))
+            print('Valid unk acc: {:.3f}'.format(unk_valid))
+            print('Valid roc: {:.3f}'.format(roc_valid))
+            print('Valid roc soft: {:.3f}'.format(roc_softm_valid))
+            print('Mean top-1 acc: {:.3f}\n'.format(
                 np.mean(test_accs[-20:])))
     if args.local_rank in [-1, 0]:
         args.writer.close()

@@ -9,7 +9,6 @@ from torchvision import transforms
 from .randaugment import RandAugmentMC
 from .mydataset import ImageFolder, ImageFolder_fix
 
-logger = logging.getLogger(__name__)
 
 __all__ = [
     'TransformOpenMatch', 'TransformFixMatch', 'cifar10_mean', 'cifar10_std',
@@ -142,8 +141,8 @@ def get_cifar(args, norm=True):
 
     unique_labeled = np.unique(train_labeled_idxs)
     val_labeled = np.unique(val_idxs)
-    logger.info("Dataset: %s" % name)
-    logger.info(f"Labeled examples: {len(unique_labeled)}"
+    print("Dataset: %s" % name)
+    print(f"Labeled examples: {len(unique_labeled)}"
                 f"Unlabeled examples: {len(train_unlabeled_idxs)}"
                 f"Valdation samples: {len(val_labeled)}")
     return train_labeled_dataset, train_unlabeled_dataset, \
@@ -173,7 +172,7 @@ def get_imagenet(args, norm=True):
     ])
     dataset_val = ImageFolder(txt_val, transform=test_transform)
     dataset_test = ImageFolder(txt_test, transform=test_transform)
-    logger.info(f"Labeled examples: {len(dataset_labeled)}"
+    print(f"Labeled examples: {len(dataset_labeled)}"
                 f"Unlabeled examples: {len(dataset_unlabeled)}"
                 f"Valdation samples: {len(dataset_val)}")
     return dataset_labeled, dataset_unlabeled, dataset_test, dataset_val
@@ -203,7 +202,7 @@ def get_opendas(args, norm=True):
     ])
     dataset_val = ImageFolder(txt_val, transform=test_transform)
     dataset_test = ImageFolder(txt_test, transform=test_transform)
-    logger.info(f"Labeled examples: {len(dataset_labeled)}"
+    print(f"Labeled examples: {len(dataset_labeled)}"
                 f"Unlabeled examples: {len(dataset_unlabeled)}"
                 f"Valdation samples: {len(dataset_val)}")
     return dataset_labeled, dataset_unlabeled, dataset_test, dataset_val

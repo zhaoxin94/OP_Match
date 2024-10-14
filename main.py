@@ -8,8 +8,6 @@ from utils import set_model_config, \
 from eval import eval_model
 from trainer import train
 
-logger = logging.getLogger(__name__)
-
 
 def main():
     args = set_parser()
@@ -27,23 +25,19 @@ def main():
         args.world_size = torch.distributed.get_world_size()
         args.n_gpu = 1
     args.device = device
-    logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        level=logging.INFO if args.local_rank in [-1, 0] else logging.WARN)
-    logger.warning(
-        f"Process rank: {args.local_rank}, "
-        f"device: {args.device}, "
-        f"n_gpu: {args.n_gpu}, "
-        f"distributed training: {bool(args.local_rank != -1)}, "
-        f"16-bits training: {args.amp}", )
-    logger.info(dict(args._get_kwargs()))
+
+    print(f"Process rank: {args.local_rank}, "
+          f"device: {args.device}, "
+          f"n_gpu: {args.n_gpu}, "
+          f"distributed training: {bool(args.local_rank != -1)}, "
+          f"16-bits training: {args.amp}")
+    print(dict(args._get_kwargs()))
     if args.seed is not None:
         set_seed(args)
     if args.local_rank in [-1, 0]:
         os.makedirs(args.out, exist_ok=True)
         args.writer = SummaryWriter(args.out)
-    
+
     set_model_config(args)
 
     if args.local_rank not in [-1, 0]:
@@ -53,7 +47,7 @@ def main():
         = set_dataset(args)
 
     model, optimizer, scheduler = set_models(args)
-    logger.info("Total params: {:.2f}M".format(
+    print("Total params: {:.2f}M".format(
         sum(p.numel() for p in model.parameters()) / 1e6))
 
     if args.use_ema:
@@ -61,7 +55,7 @@ def main():
         ema_model = ModelEMA(args, model, args.ema_decay)
     args.start_epoch = 0
     if args.resume:
-        logger.info("==> Resuming from checkpoint..")
+        print("==> Resuming from checkpoint..")
         assert os.path.isfile(
             args.resume), "Error: no checkpoint directory found!"
         args.out = os.path.dirname(args.resume)
@@ -90,18 +84,17 @@ def main():
 
     model.zero_grad()
     if not args.eval_only:
-        logger.info("***** Running training *****")
-        logger.info(f"  Task = {args.dataset}@{args.num_labeled}")
-        logger.info(f"  Num Epochs = {args.epochs}")
-        logger.info(f"  Batch size per GPU = {args.batch_size}")
-        logger.info(
-            f"  Total train batch size = {args.batch_size*args.world_size}")
-        logger.info(f"  Total optimization steps = {args.total_steps}")
+        print("***** Running training *****")
+        print(f"  Task = {args.dataset}@{args.num_labeled}")
+        print(f"  Num Epochs = {args.epochs}")
+        print(f"  Batch size per GPU = {args.batch_size}")
+        print(f"  Total train batch size = {args.batch_size*args.world_size}")
+        print(f"  Total optimization steps = {args.total_steps}")
         train(args, labeled_trainloader, unlabeled_dataset, test_loader,
               val_loader, ood_loaders, model, optimizer, ema_model, scheduler)
     else:
-        logger.info("***** Running Evaluation *****")
-        logger.info(f"  Task = {args.dataset}@{args.num_labeled}")
+        print("***** Running Evaluation *****")
+        print(f"  Task = {args.dataset}@{args.num_labeled}")
         eval_model(args, labeled_trainloader, unlabeled_dataset, test_loader,
                    val_loader, ood_loaders, model, ema_model)
 

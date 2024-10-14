@@ -17,6 +17,7 @@ __all__ = [
     'save_checkpoint', 'set_seed'
 ]
 
+
 # TODO: model
 def create_model(args):
     if 'wideresnet' in args.arch:
@@ -34,9 +35,13 @@ def create_model(args):
                                      num_classes=args.num_classes)
     elif args.arch == 'resnet_imagenet':
         import models.resnet_imagenet as models
-        model = models.resnet18(num_classes=args.num_classes)
+        if args.use_pretrain:
+            print('Use Imagenet pretrained model!')
+        model = models.resnet18(pretrained=args.use_pretrain,
+                                num_classes=args.num_classes)
 
     return model
+
 
 # TODO：set model architecture, number of classes, image size, etc.
 def set_model_config(args):
@@ -145,22 +150,51 @@ def set_models(args):
         torch.distributed.barrier()
     model.to(args.device)
 
-    no_decay = ['bias', 'bn']
-    grouped_parameters = [{
-        'params': [
-            p for n, p in model.named_parameters()
-            if not any(nd in n for nd in no_decay)
-        ],
-        'weight_decay':
-        args.wdecay
-    }, {
-        'params': [
-            p for n, p in model.named_parameters()
-            if any(nd in n for nd in no_decay)
-        ],
-        'weight_decay':
-        0.0
-    }]
+    # staged_lr
+    if args.staged_lr:
+        print('Use staged_lr to better employ the imagenet pretrained model!')
+        new_layers = ['fc_close', 'fc_open']
+        base_params = []
+        base_layers = []
+        new_params = []
+
+        for name, module in model.named_children():
+            if name in new_layers:
+                new_params += [p for p in module.parameters()]
+            else:
+                base_params += [p for p in module.parameters()]
+                base_layers.append(name)
+        
+        print('new_layers:', new_layers)
+        print('base_layers:', base_layers)
+
+        grouped_parameters = [
+            {
+                "params": base_params,
+                "lr": args.lr * 0.1
+            },
+            {
+                "params": new_params
+            },
+        ]
+    else:
+        no_decay = ['bias', 'bn']
+        grouped_parameters = [{
+            'params': [
+                p for n, p in model.named_parameters()
+                if not any(nd in n for nd in no_decay)
+            ],
+            'weight_decay':
+            args.wdecay
+        }, {
+            'params': [
+                p for n, p in model.named_parameters()
+                if any(nd in n for nd in no_decay)
+            ],
+            'weight_decay':
+            0.0
+        }]
+
     if args.opt == 'sgd':
         optimizer = optim.SGD(grouped_parameters,
                               lr=args.lr,

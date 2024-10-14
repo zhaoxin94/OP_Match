@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-logger = logging.getLogger(__name__)
 
 
 def mish(x):
@@ -266,7 +265,7 @@ def ResNet18(low_dim=128, num_classes=10):
 
 
 def build_wideresnet(depth, widen_factor, dropout, num_classes, open=False):
-    logger.info(f"Model: WideResNet {depth}x{widen_factor}")
+    print(f"Model: WideResNet {depth}x{widen_factor}")
     build_func = WideResNet_Open if open else WideResNet
     return build_func(depth=depth,
                       widen_factor=widen_factor,

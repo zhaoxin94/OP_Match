@@ -4,7 +4,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-logger = logging.getLogger(__name__)
 
 
 def mish(x):
@@ -164,7 +163,7 @@ class CifarResNeXt(nn.Module):
 
 
 def build_resnext(cardinality, depth, width, num_classes):
-    logger.info(f"Model: ResNeXt {depth+1}x{width}")
+    print(f"Model: ResNeXt {depth+1}x{width}")
     return CifarResNeXt(cardinality=cardinality,
                         depth=depth,
                         base_width=width,

@@ -12,7 +12,6 @@ import PIL.ImageEnhance
 import PIL.ImageDraw
 from PIL import Image
 
-logger = logging.getLogger(__name__)
 
 PARAMETER_MAX = 10
 

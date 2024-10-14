@@ -11,7 +11,6 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from sklearn.metrics import roc_auc_score
 
-logger = logging.getLogger(__name__)
 
 __all__ = ['get_mean_and_std', 'accuracy', 'AverageMeter',
            'accuracy_open', 'ova_loss', 'compute_roc',
@@ -26,7 +25,7 @@ def get_mean_and_std(dataset):
 
     mean = torch.zeros(3)
     std = torch.zeros(3)
-    logger.info('==> Computing mean and std..')
+    print('==> Computing mean and std..')
     for inputs, targets in dataloader:
         for i in range(3):
             mean[i] += inputs[:, i, :, :].mean()
@@ -161,7 +160,7 @@ def exclude_dataset(args, dataset, model, exclude_known=False):
             outputs, outputs_open = model(inputs)
             outputs = F.softmax(outputs, 1)
             out_open = F.softmax(outputs_open.view(outputs_open.size(0), 2, -1), 1)
-            tmp_range = torch.range(0, out_open.size(0) - 1).long().cuda()
+            tmp_range = torch.range(0, out_open.size(0) - 1).long().to(args.device)
             pred_close = outputs.data.max(1)[1]
             unk_score = out_open[tmp_range, 0, pred_close]
             known_ind = unk_score < 0.5
@@ -202,7 +201,7 @@ def test(args, test_loader, model, epoch, val=False):
             outputs, outputs_open = model(inputs)
             outputs = F.softmax(outputs, 1)
             out_open = F.softmax(outputs_open.view(outputs_open.size(0), 2, -1), 1)
-            tmp_range = torch.range(0, out_open.size(0) - 1).long().cuda()
+            tmp_range = torch.range(0, out_open.size(0) - 1).long().to(args.device)
             pred_close = outputs.data.max(1)[1]
             unk_score = out_open[tmp_range, 0, pred_close]
             known_score = outputs.max(1)[0]
@@ -213,7 +212,7 @@ def test(args, test_loader, model, epoch, val=False):
             known_targets = targets[known_targets]
 
             if len(known_pred) > 0:
-                prec1, prec5 = accuracy(known_pred, known_targets, topk=(1, 5))
+                prec1, prec5 = accuracy(known_pred, known_targets, topk=(1,2))
                 top1.update(prec1.item(), known_pred.shape[0])
                 top5.update(prec5.item(), known_pred.shape[0])
 
@@ -270,15 +269,15 @@ def test(args, test_loader, model, epoch, val=False):
                                num_known=int(outputs.size(1)))
         ind_known = np.where(label_all < int(outputs.size(1)))[0]
         id_score = unk_all[ind_known]
-        logger.info("Closed acc: {:.3f}".format(top1.avg))
-        logger.info("Overall acc: {:.3f}".format(acc.avg))
-        logger.info("Unk acc: {:.3f}".format(unk.avg))
-        logger.info("ROC: {:.3f}".format(roc))
-        logger.info("ROC Softmax: {:.3f}".format(roc_soft))
+        print("Closed acc: {:.3f}".format(top1.avg))
+        print("Overall acc: {:.3f}".format(acc.avg))
+        print("Unk acc: {:.3f}".format(unk.avg))
+        print("ROC: {:.3f}".format(roc))
+        print("ROC Softmax: {:.3f}".format(roc_soft))
         return losses.avg, top1.avg, acc.avg, \
                unk.avg, roc, roc_soft, id_score
     else:
-        logger.info("Closed acc: {:.3f}".format(top1.avg))
+        print("Closed acc: {:.3f}".format(top1.avg))
         return top1.avg
 
 
@@ -297,7 +296,7 @@ def test_ood(args, test_id, test_loader, model):
             inputs = inputs.to(args.device)
             outputs, outputs_open = model(inputs)
             out_open = F.softmax(outputs_open.view(outputs_open.size(0), 2, -1), 1)
-            tmp_range = torch.range(0, out_open.size(0) - 1).long().cuda()
+            tmp_range = torch.range(0, out_open.size(0) - 1).long().to(args.device)
             pred_close = outputs.data.max(1)[1]
             unk_score = out_open[tmp_range, 0, pred_close]
             batch_time.update(time.time() - end)

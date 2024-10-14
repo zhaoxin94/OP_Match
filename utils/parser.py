@@ -3,6 +3,17 @@ import argparse
 __all__ = ['set_parser']
 
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def set_parser():
     parser = argparse.ArgumentParser(description='PyTorch OpenMatch Training')
     ## Computational Configurations
@@ -15,10 +26,9 @@ def set_parser():
                         default=4,
                         help='number of workers')
     parser.add_argument('--seed', default=None, type=int, help="random seed")
-    parser.add_argument(
-        "--amp",
-        action="store_true",
-        help="use 16-bit (mixed) precision through AMP")
+    parser.add_argument("--amp",
+                        action="store_true",
+                        help="use 16-bit (mixed) precision through AMP")
     parser.add_argument(
         "--opt_level",
         type=str,
@@ -160,6 +170,15 @@ def set_parser():
                         default=1,
                         type=float,
                         help='pseudo label temperature')
+    # zhaoxin add
+    parser.add_argument("--use-pretrain",
+                        type=str2bool,
+                        default=False,
+                        help="Use Imagenet pretrained model or not.")
+    parser.add_argument("--staged-lr",
+                        type=str2bool,
+                        default=False,
+                        help="Use staged lr or not")
 
     args = parser.parse_args()
     return args

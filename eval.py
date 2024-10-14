@@ -1,7 +1,7 @@
 import logging
 from utils import test, test_ood
 
-logger = logging.getLogger(__name__)
+
 best_acc = 0
 best_acc_val = 0
 def eval_model(args, labeled_trainloader, unlabeled_dataset, test_loader, val_loader,
@@ -25,17 +25,17 @@ def eval_model(args, labeled_trainloader, unlabeled_dataset, test_loader, val_lo
             = test(args, test_loader, test_model, epoch)
         for ood in ood_loaders.keys():
             roc_ood = test_ood(args, test_id, ood_loaders[ood], test_model)
-            logger.info("ROC vs {ood}: {roc}".format(ood=ood, roc=roc_ood))
+            print("ROC vs {ood}: {roc}".format(ood=ood, roc=roc_ood))
 
         overall_valid = test_overall
         unk_valid = test_unk
         roc_valid = test_roc
         roc_softm_valid = test_roc_softm
-        logger.info('validation closed acc: {:.3f}'.format(val_acc))
-        logger.info('test closed acc: {:.3f}'.format(close_valid))
-        logger.info('test overall acc: {:.3f}'.format(overall_valid))
-        logger.info('test unk acc: {:.3f}'.format(unk_valid))
-        logger.info('test roc: {:.3f}'.format(roc_valid))
-        logger.info('test roc soft: {:.3f}'.format(roc_softm_valid))
+        print('validation closed acc: {:.3f}'.format(val_acc))
+        print('test closed acc: {:.3f}'.format(close_valid))
+        print('test overall acc: {:.3f}'.format(overall_valid))
+        print('test unk acc: {:.3f}'.format(unk_valid))
+        print('test roc: {:.3f}'.format(roc_valid))
+        print('test roc soft: {:.3f}'.format(roc_softm_valid))
     if args.local_rank in [-1, 0]:
         args.writer.close()
