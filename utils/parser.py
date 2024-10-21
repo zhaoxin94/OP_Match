@@ -171,6 +171,7 @@ def set_parser():
                         type=float,
                         help='pseudo label temperature')
     # zhaoxin add
+    parser.add_argument("--count-iter", type=str, default='fix_value')
     parser.add_argument("--use-pretrain",
                         type=str2bool,
                         default=False,

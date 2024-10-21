@@ -42,9 +42,14 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--exp_name', type=str, default='')
     parser.add_argument("--gpu", "-g", default=0, type=int, help="Gpu ID")
-    parser.add_argument('--lambda_oem', type=float, default=1.0)
-    parser.add_argument('--lambda_socr', type=float, default=1.0)
+    parser.add_argument('--lambda_oem', type=float, default=0.1)
+    parser.add_argument('--lambda_socr', type=float, default=0.5)
     parser.add_argument('--mu', type=int, default=2)
+    parser.add_argument('--count-iter', type=str, default='fix_value')
+    parser.add_argument('--eval-step',
+                        default=1024,
+                        type=int,
+                        help='number of eval steps to run')
     parser.add_argument("--use-pretrain",
                         type=str2bool,
                         default=False,
@@ -54,18 +59,19 @@ if __name__ == '__main__':
                         default=False,
                         help="Use staged lr or not")
 
-
     args = parser.parse_args()
 
     exp_info = args.exp_name
     if exp_info:
         exp_info = '_' + exp_info
 
-    exp_info = exp_info + f'_lr={args.lr}_batch-size={args.batch_size}_epoch={args.epoch}_lambda-oem={args.lambda_oem}_lambda-socr={args.lambda_socr}'
+    exp_info = exp_info + f'_lr={args.lr}_batch-size={args.batch_size}_epoch={args.epoch}_lambda-oem={args.lambda_oem}_lambda-socr={args.lambda_socr}_count-iter={args.count_iter}'
     if args.use_pretrain:
         exp_info += '_use-pretrain'
     if args.staged_lr:
-        exp_info += 'staged-lr'
+        exp_info += '_staged-lr'
+    if args.count_iter == 'fix_value':
+        exp_info += f'_eval-step={args.eval_step}'
 
     base_dir = osp.join('output', args.method, args.dataset, exp_info)
 
@@ -89,5 +95,6 @@ if __name__ == '__main__':
                   f'--mu {args.mu} '
                   f'--epochs {args.epoch} '
                   f'--gpu-id {args.gpu} '
+                  f'--count-iter {args.count_iter} '
                   f'--use-pretrain {args.use_pretrain} '
                   f'--staged-lr {args.staged_lr}')

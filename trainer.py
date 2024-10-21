@@ -109,7 +109,12 @@ def train(args, labeled_trainloader, unlabeled_dataset, test_loader,
 
         len_labeled_dataset = len(labeled_trainloader)
         len_unlabeled_dataset = len(unlabeled_trainloader_all)
-        num_batches = max(len_labeled_dataset, len_unlabeled_dataset)
+        if args.count_iter == 'larger_one':
+            num_batches = max(len_labeled_dataset, len_unlabeled_dataset)
+        elif args.count_iter == 'fix_value':
+            num_batches = args.eval_step
+        else:
+            raise NotImplementedError
         
         if not args.no_progress:
             p_bar = tqdm(range(num_batches),

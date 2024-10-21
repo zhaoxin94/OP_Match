@@ -180,8 +180,12 @@ def get_imagenet(args, norm=True):
 
 # TODO: set dataset
 def get_opendas(args, norm=True):
-    mean = normal_mean
-    std = normal_std
+    if args.use_pretrain:
+        mean = imagenet_mean
+        std = imagenet_std
+    else:
+        mean = normal_mean
+        std = normal_std
     txt_labeled = "filelist/opendas_train_labeled.txt"
     txt_unlabeled = "filelist/opendas_train_unlabeled.txt"
     txt_val = "filelist/opendas_val.txt"

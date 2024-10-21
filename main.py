@@ -4,13 +4,14 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 from utils import set_model_config, \
     set_dataset, set_models, set_parser, \
-    set_seed
+    set_seed, setup_logger
 from eval import eval_model
 from trainer import train
 
 
 def main():
     args = set_parser()
+    setup_logger(args.out)
     global best_acc
     global best_acc_val
 

@@ -1,6 +1,4 @@
 filelist
 data
-save_directory
-result
+output
 *.pyc
-new_results
