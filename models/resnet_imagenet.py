@@ -288,6 +288,7 @@ def resnet18(pretrained=True, **kwargs):
     model = _resnet('resnet18', BasicBlock, [2, 2, 2, 2], **kwargs)
 
     if pretrained:
+        print('Use Imagenet Pretrained ResNet18 model')
         init_pretrained_weights(model, model_urls["resnet18"])
 
     return model
@@ -300,6 +301,7 @@ def resnet50(pretrained=True, **kwargs):
     model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], **kwargs)
 
     if pretrained:
+        print('Use Imagenet Pretrained ResNet50 model')
         init_pretrained_weights(model, model_urls["resnet50"])
 
     return model
